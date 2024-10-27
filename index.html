@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Moon 3D</title>
+    <style>
+        /* Set the video width to 100% of the viewport width */
+        #scrollVideo {
+            width: 100vw;
+            height: auto;
+        }
+        
+        /* Just to add some scrolling space */
+        body {
+            height: 200vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your video element -->
+    <video id="scrollVideo" src="video.mp4" muted></video>
+
+    <script src="script.js"></script>
+</body>
+</html>
