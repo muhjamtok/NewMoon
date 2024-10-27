@@ -11,6 +11,7 @@
             height: 200vh; /* Creates a scrollable area */
             overflow-y: scroll;
             background-color: black;
+            scroll-behavior: smooth; /* Smooth scrolling effect */
         }
 
         /* Video styling for fixed positioning */
@@ -19,23 +20,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%); /* Centers video */
-            height: 100vh; /* Default: fit height */
-            width: auto;
-            object-fit: cover;
-        }
-
-        /* Adjust to fit width in portrait orientation */
-        @media (orientation: portrait) {
-            #scrollVideo {
-                width: 100vw;
-                height: auto;
-            }
+            height: auto; /* Keep aspect ratio */
+            width: 100%; /* Make the width responsive */
+            max-height: 100vh; /* Prevent overflow on the height */
+            object-fit: contain; /* Ensures the entire video fits */
         }
     </style>
 </head>
 <body>
     <!-- Video element -->
-    <video id="scrollVideo" src="video.webm" muted preload="auto"></video>></video>
+    <video id="scrollVideo" src="video.webm" muted></video>
 
     <script>
         const video = document.getElementById("scrollVideo");
@@ -44,27 +38,28 @@
         video.addEventListener("loadedmetadata", () => {
             const duration = video.duration;
             let scrollFraction = 0;
+            let lastScrollY = window.scrollY;
 
-            // Handle scroll event with debounce
-            const handleScroll = () => {
+            // Function to update video based on scroll position
+            const updateVideoPlayback = () => {
                 const scrollPosition = window.scrollY;
                 const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
-                // Update scroll fraction with a capped value between 0 and 1
+                // Calculate the scroll fraction
                 scrollFraction = Math.min(scrollPosition / maxScroll, 1);
-                video.currentTime = duration * scrollFraction;
+
+                // Update video playback position if the scroll position has changed
+                if (scrollPosition !== lastScrollY) {
+                    video.currentTime = duration * scrollFraction;
+                    lastScrollY = scrollPosition; // Update last scroll position
+                }
+
+                // Request the next animation frame
+                requestAnimationFrame(updateVideoPlayback);
             };
 
-            let ticking = false;
-            window.addEventListener("scroll", () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        handleScroll();
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            });
+            // Start the animation loop
+            requestAnimationFrame(updateVideoPlayback);
         });
     </script>
 </body>
