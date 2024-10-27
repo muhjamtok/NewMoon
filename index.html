@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Scroll-Controlled Video</title>
+    <title>New Moon 3D</title>
     <style>
         /* Basic styling */
         body, html {
@@ -35,7 +35,7 @@
 </head>
 <body>
     <!-- Video element -->
-    <video id="scrollVideo" src="video.mp4" muted></video>
+    <video id="scrollVideo" src="video.webm" muted preload="auto"></video>></video>
 
     <script>
         const video = document.getElementById("scrollVideo");
@@ -43,24 +43,27 @@
         // Ensure video metadata is loaded before getting duration
         video.addEventListener("loadedmetadata", () => {
             const duration = video.duration;
-            const updateVideo = () => {
-                video.currentTime = duration * scrollFraction;
-                requestAnimationFrame(updateVideo); // Continuously update at the screen's refresh rate
-            };
+            let scrollFraction = 0;
 
-            // Initialize the animation loop
-            requestAnimationFrame(updateVideo);
-
-
-            // Listen for scroll events on the window
-            window.addEventListener("scroll", () => {
-                // Calculate the scroll progress as a fraction of the page's scrollable area
+            // Handle scroll event with debounce
+            const handleScroll = () => {
                 const scrollPosition = window.scrollY;
                 const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                const scrollFraction = Math.min(scrollPosition / maxScroll, 1); // Ensure it doesn't exceed 1
 
-                // Update video playback position
+                // Update scroll fraction with a capped value between 0 and 1
+                scrollFraction = Math.min(scrollPosition / maxScroll, 1);
                 video.currentTime = duration * scrollFraction;
+            };
+
+            let ticking = false;
+            window.addEventListener("scroll", () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        handleScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
             });
         });
     </script>
