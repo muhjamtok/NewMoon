@@ -3,29 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Moon 3D</title>
+    <title>Fixed Scroll-Controlled Video</title>
     <style>
-        /* Set the video width to 100% of the viewport width */
-        #scrollVideo {
-            width: 100vw;
-            height: auto;
-        }
-        
-        /* Just to add some scrolling space */
-        body {
-            height: 200vh;
+        /* Basic styling */
+        body, html {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 200vh; /* Creates a scrollable area */
             overflow-y: scroll;
+            background-color: black;
+        }
+
+        /* Video styling for fixed positioning */
+        #scrollVideo {
+            position: fixed; /* Keeps video fixed in place */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centers video */
+            height: 100vh; /* Default: fit height */
+            width: auto;
+            object-fit: cover;
+        }
+
+        /* Adjust to fit width in portrait orientation */
+        @media (orientation: portrait) {
+            #scrollVideo {
+                width: 100vw;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Your video element -->
+    <!-- Video element -->
     <video id="scrollVideo" src="video.mp4" muted></video>
 
-    <script src="script.js"></script>
+    <script>
+        const video = document.getElementById("scrollVideo");
+
+        // Ensure video metadata is loaded before getting duration
+        video.addEventListener("loadedmetadata", () => {
+            const duration = video.duration;
+            const updateVideo = () => {
+                video.currentTime = duration * scrollFraction;
+                requestAnimationFrame(updateVideo); // Continuously update at the screen's refresh rate
+            };
+
+            // Initialize the animation loop
+            requestAnimationFrame(updateVideo);
+
+
+            // Listen for scroll events on the window
+            window.addEventListener("scroll", () => {
+                // Calculate the scroll progress as a fraction of the page's scrollable area
+                const scrollPosition = window.scrollY;
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollFraction = Math.min(scrollPosition / maxScroll, 1); // Ensure it doesn't exceed 1
+
+                // Update video playback position
+                video.currentTime = duration * scrollFraction;
+            });
+        });
+    </script>
 </body>
 </html>
